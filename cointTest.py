@@ -16,6 +16,7 @@ class cointSeries:
     def createCoint(self):
         """
         Find the most gaussiany cointegrated pairs
+        TODO: Find a better measure for Gaussian-ness
         """
         ts = self.ts
         roll_length = 50
