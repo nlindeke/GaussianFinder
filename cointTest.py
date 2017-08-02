@@ -14,7 +14,9 @@ class cointSeries:
         self.ts = d.datamanager(self.iid, 2015,1,2017,1).closeData()
         
     def createCoint(self):
-        
+        """
+        Find the most gaussiany cointegrated pairs
+        """
         ts = self.ts
         roll_length = 50
         nof_interation = 20
@@ -45,10 +47,10 @@ class cointSeries:
                     
     
                 spread = weighted_one - weighted_two
-    
+                sk = ss.skew(spread)    
                 kur = ss.kurtosis(spread)
                 
-                if kur > 0:
+                if kur > 0 and sk < 0.2 and sk > -0.2:
                     score.append([kur, self.iid[i], self.iid[ran_choice]])
                 else:
                     score.append([10, self.iid[i], self.iid[ran_choice]])
