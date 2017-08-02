@@ -17,9 +17,10 @@ class cointSeries:
         
         ts = self.ts
         roll_length = 50
+        nof_interation = 20
         global_best = [10, 'nan', 'nan']
         
-        for iteration in range(0,10):
+        for iteration in range(nof_interation):
 
             score = []
 
@@ -35,7 +36,13 @@ class cointSeries:
     
                 ma_s = np.array(ts[self.iid[ran_choice]].rolling(window=roll_length).mean().dropna())
                 ts_adj_s = np.array(ts[self.iid[ran_choice]])[roll_length-1:]
-                weighted_two = ts_adj_s/ma_s
+
+                try :
+                    weighted_two = ts_adj_s/ma_s
+                except ValueError: 
+                    print("Error occured in the pair: ", self.iid[i], self.iid[ran_choice])
+                    continue
+                    
     
                 spread = weighted_one - weighted_two
     
@@ -48,8 +55,8 @@ class cointSeries:
             
             local_best = min(score, key=lambda x: x[0])
 
-        if local_best[0] < global_best[0]:
-            global_best = local_best
+            if local_best[0] < global_best[0]:
+                global_best = local_best
                 
         return global_best
             
