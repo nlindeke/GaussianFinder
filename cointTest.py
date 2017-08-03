@@ -20,14 +20,14 @@ class cointSeries:
         """
         ts = self.ts
         roll_length = 50
-        nof_interation = 50
+        nof_interation = np.shape(ts)[1]
         global_best = [10, 'nan', 'nan']
         
         for iteration in range(nof_interation):
 
             score = []
 
-            for i in range(np.shape(ts)[1]):
+            for i in range(nof_interation):
     
                 ma = np.array(ts[self.iid[i]].rolling(window=roll_length).mean().dropna())
                 ts_adj = np.array(ts[self.iid[i]])[roll_length-1:]
@@ -38,11 +38,12 @@ class cointSeries:
     
                 ma_s = np.array(ts[self.iid[ran_choice]].rolling(window=roll_length).mean().dropna())
                 ts_adj_s = np.array(ts[self.iid[ran_choice]])[roll_length-1:]
-
+                
+                #TODO: Look for better way of 'normalizing' the time series
                 try :
                     weighted_two = ts_adj_s/ma_s
                     
-                except ValueError: 
+                except ValueError:
                     print("Error occured in the pair: ", self.iid[i], self.iid[ran_choice])
                     continue
 
@@ -50,6 +51,8 @@ class cointSeries:
                 kur = ss.kurtosis(spread)
                 k = np.corrcoef(np.array(ts[self.iid[i]]), np.array(ts[self.iid[ran_choice]]))
 
+                #If kurtosis and the correlation is positive save the value 
+                #otherwise save shit-value so it won't be considered
                 if kur > 0.0 and k[1,0] > 0.3:
                     score.append([kur, self.iid[i], self.iid[ran_choice]])
                 else:
@@ -57,6 +60,8 @@ class cointSeries:
 
             local_best = min(score, key=lambda x: x[0])
             print(global_best)
+
+            #Update global best if a better pair is found
             if local_best[0] < global_best[0]:
                 global_best = local_best
 
