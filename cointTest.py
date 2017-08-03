@@ -7,11 +7,15 @@ import scipy.stats as ss
 import matplotlib.pyplot as plt
 
 stocks = list(ticks.symbol_dict)
+etfs = ticks.etf_list
+#dat = d.datamanager(etfs, 2013,1,2017,7).closeData()
+#dat.to_csv('etf_data', sep=';')
 
 class cointSeries:
     def __init__(self):
-        self.iid = stocks
-        self.ts = d.datamanager(self.iid, 2013,1,2017,5).closeData()
+        self.iid = etfs
+        #self.ts = d.datamanager(self.iid, 2013,1,2017,7).closeData()
+        self.ts = pd.DataFrame.from_csv('etf_data', sep=';')
         
     def createCoint(self):
         """
@@ -20,19 +24,25 @@ class cointSeries:
         TODO: Look for better way of 'normalizing' the time series        
         """
         ts = self.ts
-        roll_length = 50
+        roll_length = 100
         nof_interation = np.shape(ts)[1]
-        global_best = [10, 'nan', 'nan']
+        global_best = [100, 'nan', 'nan']
         
-        for iteration in range(nof_interation):
+        for iteration in range(nof_interation+100):
 
             score = []
 
             for i in range(nof_interation):
+                weighted_one = 0.0
+                weighted_two = 0.0
     
                 ma = np.array(ts[self.iid[i]].rolling(window=roll_length).mean().dropna())
                 ts_adj = np.array(ts[self.iid[i]])[roll_length-1:]
-                weighted_one = ts_adj/ma
+                try:
+                    weighted_one = (ts_adj - ma) / np.std(ts_adj)
+                except ValueError:
+                    #print("Error occured in the pair: ", self.iid[i], self.iid[ran_choice])
+                    continue
     
                 ran_choice = int(np.random.choice(len(self.iid), 1))
                 if ran_choice == i: ran_choice = int(np.random.choice(len(self.iid), 1))
@@ -42,10 +52,10 @@ class cointSeries:
                 
 
                 try :
-                    weighted_two = ts_adj_s/ma_s
+                    weighted_two = (ts_adj_s - ma_s) / np.std(ts_adj_s)
                     
                 except ValueError:
-                    print("Error occured in the pair: ", self.iid[i], self.iid[ran_choice])
+                    #print("Error occured in the pair: ", self.iid[i], self.iid[ran_choice])
                     continue
 
                 spread = weighted_one - weighted_two  
@@ -57,17 +67,37 @@ class cointSeries:
                 if kur > 0.0 and k[1,0] > 0.3:
                     score.append([kur, self.iid[i], self.iid[ran_choice]])
                 else:
-                    score.append([10, self.iid[i], self.iid[ran_choice]])
+                    score.append([100, self.iid[i], self.iid[ran_choice]])
 
             local_best = min(score, key=lambda x: x[0])
-            print(global_best)
+            
 
             #Update global best if a better pair is found
             if local_best[0] < global_best[0]:
                 global_best = local_best
+                print(global_best)
 
         return global_best, [ts[global_best[1]], ts[global_best[2]]]
 
 x = cointSeries().createCoint()
 print(x[0])
-plt.plot(np.array([x[1][1], x[1][0]]).T)
+one = x[1][1]
+ma = np.array(one.rolling(window=50).mean().dropna())
+ts_adj = np.array(one)[50-1:]
+weighted_one = (ts_adj -ma) / np.std(ts_adj)
+
+two = x[1][0]
+
+ma2 = np.array(two.rolling(window=50).mean().dropna())
+ts_adj2 = np.array(two)[50 - 1:]
+weighted_two = (ts_adj2 -ma2) / np.std(ts_adj2)
+spread = weighted_one - weighted_two
+
+s1 = np.array([weighted_one, weighted_two]).T
+s2 = np.array(spread)
+plt.figure(1)
+plt.subplot(211)
+plt.plot(s1)
+plt.subplot(212)
+plt.plot(s2)
+
