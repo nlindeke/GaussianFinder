@@ -17,6 +17,7 @@ class cointSeries:
         """
         Find the most gaussiany cointegrated pairs
         TODO: Find a better measure for Gaussian-ness
+        TODO: Look for better way of 'normalizing' the time series        
         """
         ts = self.ts
         roll_length = 50
@@ -39,7 +40,7 @@ class cointSeries:
                 ma_s = np.array(ts[self.iid[ran_choice]].rolling(window=roll_length).mean().dropna())
                 ts_adj_s = np.array(ts[self.iid[ran_choice]])[roll_length-1:]
                 
-                #TODO: Look for better way of 'normalizing' the time series
+
                 try :
                     weighted_two = ts_adj_s/ma_s
                     
