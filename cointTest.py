@@ -23,11 +23,11 @@ class cointSeries:
         TODO: Find a better measure for Gaussian-ness
         TODO: Look for better way of 'normalizing' the time series        
         """
-        ts = self.ts[ll:]
+        ts = self.ts[ll:ll+255]
+        top_players = []        
         roll_length = 100
         nof_interation = np.shape(ts)[1]
         global_best = [100, 'nan', 'nan']
-        
         for iteration in range(nof_interation+100):
 
             score = []
@@ -75,15 +75,17 @@ class cointSeries:
             #Update global best if a better pair is found
             if local_best[0] < global_best[0]:
                 global_best = local_best
+                top_players.append(global_best)
                 print(global_best)
 
-        return global_best, [ts[global_best[1]], ts[global_best[2]]]
-
-for lookback_length in [1000, 700, 400, 200, 100, 0]:
+        return global_best, [ts[global_best[1]], ts[global_best[2]]], top_players
+toplist = []
+for lookback_length in [300, 500, 700, 900]:
     print("")
     print("Evaluating from 2012 plus {} days".format(lookback_length))
     
     x = cointSeries().createCoint(lookback_length)
+    toplist.append(x[2])
     
     one = x[1][1]
     ma = np.array(one.rolling(window=50).mean().dropna())
