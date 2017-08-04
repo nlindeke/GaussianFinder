@@ -28,7 +28,7 @@ class cointSeries:
         nof_interation = np.shape(ts)[1]
         global_best = [100, 'nan', 'nan']
         
-        for iteration in range(nof_interation):
+        for iteration in range(nof_interation+100):
 
             score = []
 
