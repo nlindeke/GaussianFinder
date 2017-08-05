@@ -76,10 +76,48 @@ class cointSeries:
             if local_best[0] < global_best[0]:
                 global_best = local_best
                 top_players.append(global_best)
-                print(global_best)
 
         return global_best, [ts[global_best[1]], ts[global_best[2]]], top_players
 
+    def find_same_in_seq(self):
+        """
+        """
+        seq = []
+        rng = np.arange(0,1000,100)
+        for look in rng:
+            x = self.createCoint(look)
+            for m in range(len(x[2])):
+                for k in range(1,3):
+                    seq.append(x[2][m][k])    
+        score = []
+        for i in range(0, len(seq) - 2, 2):
+            pair = seq[i:i+2]
+            for k in range(0, len(seq) - 2, 2):
+                if k == i: continue
+                counter_pair = seq[k:k + 2]
+                match = 0
+                for m in range(2):
+                    if counter_pair[m] == pair[m]:
+                        match += 1
+                    if m == 1 and counter_pair[m - 1] == pair[m] or counter_pair[m] == pair[m - 1]:
+                        match += 1
+                    if m == 1 and match > 0:
+                        score.append([i, match, k])
+                        
+        score = [[seq[score[i][0]], seq[score[i][2]]] if score[i][1] >= 2 else 0 for i in range(len(score))]
+        return score
+
+
+    
+    
+
+
+
+
+same_seq = cointSeries().find_same_in_seq()
+print(same_seq)
+    
+"""
 toplist = []
 for lookback_length in [300, 500, 700, 900]:
     print("")
@@ -108,22 +146,4 @@ for lookback_length in [300, 500, 700, 900]:
     plt.subplot(212)
     plt.plot(s2)
     plt.show()
-
-def find_same_in_seq(seq):
-    score = []
-    for i in range(0, len(seq)-2, 2):
-        pair = seq[i:i+2]
-        for k in range(0, len(seq)-2, 2):
-            if k == i: continue
-            counter_pair = seq[k:k+2]
-            match = 0
-            for m in range(2):
-                if counter_pair[m] == pair[m]:
-                    match += 1
-                if m == 1 and counter_pair[m - 1] == pair[m] or counter_pair[m] == pair[m - 1]:
-                    match += 1
-                if m == 1 and match > 0:
-                    score.append([i, match, k])
-                    
-    score = [[seq[score[i][0]], seq[score[i][2]]] if score[i][1] == 2 else 0 for i in range(len(score))]
-    return score
+"""
