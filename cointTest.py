@@ -11,24 +11,23 @@ etfs = ticks.etf_list
 #dat = d.datamanager(etfs, 2012,1,2017,7).closeData()
 #dat.to_csv('etf_data', sep=';')
 
-class cointSeries:
+class coint_series:
     def __init__(self):
         self.iid = etfs
         #self.ts = d.datamanager(self.iid, 2013,1,2017,7).closeData()
         self.ts = pd.DataFrame.from_csv('etf_data', sep=';')
         
-    def createCoint(self, ll):
+    def create_coint(self, ll):
         """
         Find the most gaussiany cointegrated pairs
-        TODO: Find a better measure for Gaussian-ness
-        TODO: Look for better way of 'normalizing' the time series        
+        TODO: Find a better measure for Gaussian-ness  
         """
-        ts = self.ts[ll:ll+255]
+        ts = self.ts[ll:ll + 300]
         top_players = []        
         roll_length = 100
         nof_interation = np.shape(ts)[1]
         global_best = [100, 'nan', 'nan']
-        for iteration in range(nof_interation+100):
+        for iteration in range(nof_interation):
 
             score = []
 
@@ -81,15 +80,18 @@ class cointSeries:
 
     def find_same_in_seq(self):
         """
+        Extract the most recurring assets to construct any form of pair.
         """
         seq = []
+        score = []
         rng = np.arange(0,1000,100)
+        
         for look in rng:
-            x = self.createCoint(look)
+            x = self.create_coint(look)
             for m in range(len(x[2])):
                 for k in range(1,3):
                     seq.append(x[2][m][k])    
-        score = []
+
         for i in range(0, len(seq) - 2, 2):
             pair = seq[i:i+2]
             for k in range(0, len(seq) - 2, 2):
@@ -114,7 +116,7 @@ class cointSeries:
 
 
 
-same_seq = cointSeries().find_same_in_seq()
+same_seq = coint_series().find_same_in_seq()
 print(same_seq)
     
 """
